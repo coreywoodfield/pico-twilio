@@ -10,7 +10,7 @@ ruleset twilio {
 		}
 
     messages = function(account_sid, auth_token, page=0, page_size=50, to=null, from=null) {
-      http:get(<<https://#{account_sid}:#{auth_token}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Messages.json?Page=#{(page == null) => 0 | page}&PageSize=#{(page_size == null) => 50 | page_size}>> + ((to == null) => "" | <<&To=#{to}>>) + ((from == null) => "" | <<&From=#{from}>>)).decode(){"messages"}
+      http:get(<<https://#{account_sid}:#{auth_token}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Messages.json?Page=#{(page == null) => 0 | page}&PageSize=#{(page_size == null) => 50 | page_size}>> + ((to == null) => "" | <<&To=#{to}>>) + ((from == null) => "" | <<&From=#{from}>>)){"content"}.decode(){"messages"}
     }
 	}
 
