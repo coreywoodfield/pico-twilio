@@ -12,6 +12,10 @@ ruleset twilio {
 
 	rule test_send_sms {
 		select when test new_message
-		send_sms(event:attr("to"), event:attr("from"), event:attr("message"), keys:account_sid, keys:auth_token)
+    pre {
+      sid = keys:twilio("account_sid")
+      auth = keys:twilio("auth_token")
+    }
+		send_sms(event:attr("to"), event:attr("from"), event:attr("message"), sid, auth)
 	}
 }
