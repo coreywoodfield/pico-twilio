@@ -10,10 +10,7 @@ ruleset twilio {
 		}
 
     messages = function(account_sid, auth_token, page=0, page_size=50, to=null, from=null) {
-      base_url = <<https://#{account_sid}:#{auth_token}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Messages.json?Page=#{page}&PageSize=#{page_size}>>
-      base_url += (to == null) => "" | <<&To=#{to}>>
-      base_url += (from == null) => "" | <<&From=#{from}>>
-      http:get(base_url){"messages"}
+      http:get(<<https://#{account_sid}:#{auth_token}@api.twilio.com/2010-04-01/Accounts/#{account_sid}/Messages.json?Page=#{page}&PageSize=#{page_size}>> + ((to == null) => "" | <<&To=#{to}>>) + ((from == null) => "" | <<&From=#{from}>>)){"messages"}
     }
 	}
 
@@ -21,4 +18,9 @@ ruleset twilio {
 		select when test new_message
 		send_sms(event:attr("to"), event:attr("from"), event:attr("message"), keys:twilio{"account_sid"}, keys:twilio{"auth_token"})
 	}
+
+  rule get_messages {
+    select when test get_messages
+    send_directive("say", {"messages": messages(keys:twilio{"account_sid"}, keys:twilio{"auth_token"}, event:attr("page"), event:attr("page_size"), event:attr("to"), event:attr("from"))})
+  }
 }
